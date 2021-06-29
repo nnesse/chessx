@@ -48,6 +48,8 @@ public:
 
     QString engineName() const;
     void updateBookFile(Database*);
+    
+    QList<Analysis> m_analyses;
 
 public slots:
     /** Sets new position. If analysis is active, the current content will be cleared and
@@ -119,7 +121,6 @@ private:
     void updateBookMoves();
     bool sendBookMove();
 
-    QList<Analysis> m_analyses;
     Ui::AnalysisWidget ui;
     QPointer<EngineX> m_engine;
     BoardX m_board;

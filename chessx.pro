@@ -3,6 +3,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += uic warn_on
 QT += network svg
 
+QMAKE_CXXFLAGS += -std=c++17
+
 TEMPLATE = app
 
 greaterThan(QT_MAJOR_VERSION, 4) {

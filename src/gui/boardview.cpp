@@ -19,6 +19,7 @@
 #include "settings.h"
 #include "guess.h"
 #include "move.h"
+#include "analysiswidget.h"
 
 #include <QApplication>
 #include <QSizePolicy>
@@ -49,7 +50,8 @@ BoardView::BoardView(QWidget* parent, int flags) : QWidget(parent),
     m_DbIndex(nullptr),
     m_showAttacks(NoColor),
     m_showUnderProtection(NoColor),
-    lastMoveEvent(nullptr)
+    lastMoveEvent(nullptr),
+    m_analysis(nullptr)
 {
     QSizePolicy policy = sizePolicy();
     policy.setHeightForWidth(true);
@@ -484,6 +486,8 @@ void BoardView::drawPieces(QPaintEvent* event)
                               QRect(rect2.topLeft(),rect1.bottomRight()));
 }
 
+#include <algorithm>
+
 void BoardView::paintEvent(QPaintEvent* event)
 {
     drawSquares(event);
@@ -496,7 +500,39 @@ void BoardView::paintEvent(QPaintEvent* event)
     drawPieces(event);
     drawHiliting(event);
     drawMoveIndicator(event);
+    
     drawArrowAnnotations(event);
+
+    if (m_analysis != nullptr) {
+	float maxScore = -100000;
+	float minScore = 100000;
+
+	float scale = m_board.blackToMove() ? -1 : 1;
+
+	for (auto a : m_analysis->m_analyses) {
+		if (a.variation().count() && !a.bestMove()) {
+			float s = a.score() * scale;
+			if (s > maxScore) {
+				maxScore = s;
+			}
+			if (s < minScore) {
+				minScore = s;
+			}
+		}
+	}
+        float scoreRange = maxScore - minScore;
+	for (auto a : m_analysis->m_analyses) {
+		if (a.variation().count() && !a.bestMove()) {
+			float relScore = maxScore - (a.score() * scale);
+
+			QColor c(0, std::max(0.0f, 255 - ((relScore * 255.0f) / 500.0f)), 0, 255);
+			Move m = a.variation().at(0);
+			auto from = m.from();
+			auto to = m.to();
+			drawArrow(from, to, c, 0); 
+		}
+	}
+    }
     drawDraggedPieces(event);
 }
 
@@ -1310,7 +1346,6 @@ void BoardView::drawSquareAnnotations(QPaintEvent* event)
 void BoardView::drawArrowAnnotations(QPaintEvent* event)
 {
     QString annotation = m_board.arrowAnnotation();
-
     if(!annotation.isEmpty() && !annotation.isNull())
     {
         QStringList list = annotation.split(",");

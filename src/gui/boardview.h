@@ -33,6 +33,8 @@ class BoardTheme;
 The BoardView class represents a widget for displaying current
 position on the screen. */
 
+class AnalysisWidget;
+
 class BoardView : public QWidget
 {
     Q_OBJECT
@@ -49,6 +51,13 @@ public:
     * @p IgnoreSideToMove - allow dragging all pieces (useful for setting up a position)
     */
     BoardView* boardView() { return this; }
+
+    AnalysisWidget *m_analysis;
+
+    void setAnalysisWidget(AnalysisWidget *w) {
+	m_analysis = w;    
+    }
+
     void setFlags(int flags);
     int flags() const;
     /** Update and shows current position. */

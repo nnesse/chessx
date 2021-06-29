@@ -3688,6 +3688,8 @@ BoardView* MainWindow::CreateBoardView()
         boardView->setBoard(BoardX::standardStartBoard);
         boardView->setDbIndex(m_currentDatabase);
 
+	boardView->setAnalysisWidget(m_mainAnalysis);
+
         connect(this, SIGNAL(reconfigure()), boardView, SLOT(configure()));
         connect(boardView, SIGNAL(moveMade(Square, Square, int)), SLOT(slotBoardMove(Square, Square, int)));
         connect(boardView, SIGNAL(clicked(Square, int, QPoint, Square)), SLOT(slotBoardClick(Square, int, QPoint, Square)));
